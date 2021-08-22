@@ -762,8 +762,8 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
 
         /** Columns to show in the table. */
         String[] properties = { "Level", "Time", "PID",
-            // "Application",
             "TID",// add tid
+            "Application",
             "Tag", "Text", };
 
         /**
@@ -775,7 +775,7 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
                 "    ",
                 "    00-00 00:00:00.0000 ",
                 "  0000",
-                // "    com.android.launcher",
+                "    com.android.launcher",
                 "  0000",// add tid
                 "    SampleTagText++++",
                 "    Log Message field should be pretty long by default. As long as possible for correct display on Mac.", };
@@ -826,10 +826,10 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
             @Override
             public void widgetSelected(SelectionEvent e) {
                 mIsSynFromHere = true;
-                String time = getSelectedLogCatMessages().get(0).getLogCatMessage().getTime();
+                /*String time = getSelectedLogCatMessages().get(0).getLogCatMessage().getTime();
                 if (time != null && time.length() > 10) {// 04-08 13:13:43.851
                     LogCatSyncManager.getInstance().syncTime(time);
-                }
+                }*/
             }
 
             @Override
@@ -931,19 +931,25 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
                 if (selectedItems == null || selectedItems.size() == 0) {
                     return;
                 }
-                mSelectedTagList = new ArrayList<String>();
-                mSelectedTagList.add(LogCatFilter.HIDE_KEYWORD);
-                setText(getText() + " : ");
+                if(mSelectedTagList == null)
+                {
+                    mSelectedTagList = new ArrayList<String>();
+                    mSelectedTagList.add(LogCatFilter.HIDE_KEYWORD);                	
+                }
+
+                String text = getText();
+                setText(text + " : ");
                 for (LogCatMessageWrapper item : selectedItems) {
                     String tag = item.getLogCatMessage().getTag();
                     if (!mSelectedTagList.contains(tag)) {
-                        setText(getText() + tag + ", ");
+                    	String text1 = getText();
+                        setText(text1 + tag + ", ");
                         mSelectedTagList.add(tag);
                     }
                 }
                 updateAppliedFilters();
                 mShowSelectedTag.setEnabled(false);
-                mHideSelectedTag.setEnabled(false);
+                //mHideSelectedTag.setEnabled(false);
             }
         };
         mResetTag = new Action(RESET_TAG_FILTER) {
@@ -992,9 +998,12 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
                     return;
                 }
                 mShowSelectedPID.setEnabled(false);
-                mHideSelectedPID.setEnabled(false);
-                mSelectedPIDList = new ArrayList<String>();
-                mSelectedPIDList.add(LogCatFilter.HIDE_KEYWORD);
+                //mHideSelectedPID.setEnabled(false);
+                if(mSelectedPIDList == null)
+                {
+                	mSelectedPIDList = new ArrayList<String>();
+                    mSelectedPIDList.add(LogCatFilter.HIDE_KEYWORD);	
+                }
                 setText(getText() + " : ");
                 for (LogCatMessageWrapper item : selectedItems) {
                     String PID = item.getLogCatMessage().getPid();

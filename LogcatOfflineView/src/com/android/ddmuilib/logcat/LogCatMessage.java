@@ -28,7 +28,7 @@ public final class LogCatMessage {
     private final LogLevel mLogLevel;
     private final String mPid;
     private final String mTid;
-//    private final String mAppName;
+    private String mAppName = null;
     private final String mTag;
     private final String mTime;
     private final String mMessage;
@@ -37,10 +37,10 @@ public final class LogCatMessage {
      * Construct an immutable log message object.
      */
     public LogCatMessage(LogLevel logLevel, String pid, String tid, 
-            String tag, String time, String msg) {
+            String tag, String time, String msg, String appName) {
         mLogLevel = logLevel;
         mPid = pid;
-//        mAppName = appName;
+        mAppName = appName;
         mTag = tag;
         mTime = time;
         mMessage = msg;
@@ -73,9 +73,9 @@ public final class LogCatMessage {
         return mTid;
     }
 
-//    public String getAppName() {
-//        return mAppName;
-//    }
+    public String getAppName() {
+        return mAppName;
+    }
 
     public String getTag() {
         return mTag;

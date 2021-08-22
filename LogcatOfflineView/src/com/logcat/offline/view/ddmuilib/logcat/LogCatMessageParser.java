@@ -17,6 +17,7 @@
 package com.logcat.offline.view.ddmuilib.logcat;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +35,7 @@ import java.util.regex.Pattern;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmuilib.logcat.LogCatMessage;
 import com.logcat.offline.UIThread;
+import java.util.Map;
 
 /**
  * Class to parse raw output of {@code adb logcat -v long} to {@link LogCatMessage} objects.
@@ -42,6 +45,8 @@ public final class LogCatMessageParser {
 	private static Set<ILogCatMessageEventListener> mLogCatMessageListeners;
     
     private static LogCatMessageParser logCatMessageParser;
+    
+    private static Map<String,String> s_PID_AppnameMap = new HashMap<>();
 
     /**
      * This pattern is meant to parse the first line of a log message with the option
@@ -76,6 +81,33 @@ public final class LogCatMessageParser {
     		mLogCatMessageListeners = new HashSet<ILogCatMessageEventListener>();
     	}
     	return logCatMessageParser;
+    }
+    
+    private String tryGetAppName(String pid, String message, String tag)
+    {
+    	if(tag !=null && tag.equals("ActivityManager"))
+    	{
+    		//Parse Application Name;
+    		Pattern p = Pattern.compile("Start proc ([0-9]+):([\\w\\.:]+).*");
+        	Matcher matcher = p.matcher(message);
+        	if(matcher.find()) 
+        	{
+        		String foundPid = matcher.group(1);
+        		String foundAppName = matcher.group(2);
+        		if(!s_PID_AppnameMap.containsKey(foundPid))
+        		{
+            		s_PID_AppnameMap.put(foundPid, foundAppName);
+        		}
+        	}
+    	}
+    	
+    	
+    	if(s_PID_AppnameMap.containsKey(pid))
+    	{
+    		return s_PID_AppnameMap.get(pid);
+    	}
+    	    	
+    	return pid;
     }
     
     private PatternType PatternRecognition(String str){
@@ -195,6 +227,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -222,9 +255,10 @@ public final class LogCatMessageParser {
 				if (curLogLevel == null) {
 					continue;
 				}
+				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage,curAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -245,6 +279,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -274,9 +309,10 @@ public final class LogCatMessageParser {
 				if (curLogLevel == null) {
 					continue;
 				}
-
+				
+				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage,curAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -295,6 +331,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -325,8 +362,9 @@ public final class LogCatMessageParser {
 					continue;
 				}
 
+				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage, curAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -344,6 +382,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String currAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -364,8 +403,9 @@ public final class LogCatMessageParser {
 				if (curLogLevel == null) {
 					continue;
 				}
+				currAppName = tryGetAppName(curPid, curMesssage, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage, currAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -383,6 +423,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -407,8 +448,9 @@ public final class LogCatMessageParser {
 				if (curLogLevel == null) {
 					continue;
 				}
+				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage,curAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -426,6 +468,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -447,8 +490,9 @@ public final class LogCatMessageParser {
 				if (curLogLevel == null) {
 					continue;
 				}
+				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage,curAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -460,7 +504,7 @@ public final class LogCatMessageParser {
     private static final String UNKNOWN_FORMAT_TAG = "UNKNOWN_FORMAT";
 	private void addAsUnkownFormat(List<LogCatMessage> messages, String line) {
 		LogCatMessage m = new LogCatMessage(LogLevel.WARN, "", "",
-				UNKNOWN_FORMAT_TAG, "", line);
+				UNKNOWN_FORMAT_TAG, "", line,"?");
 		messages.add(m);
 	}
 	
@@ -476,6 +520,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curMesssage = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -505,9 +550,11 @@ public final class LogCatMessageParser {
 				if (curLogLevel == null) {
 					continue;
 				}
+				
+				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage);
+						curTid, curTag, curTime, curMesssage,curAppName);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -522,6 +569,7 @@ public final class LogCatMessageParser {
 		String curTid = "?";
 		String curTag = "?";
 		String curTime = "?";
+		String curAppName = "?";
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -548,8 +596,9 @@ public final class LogCatMessageParser {
 				if (curTag.indexOf(",") != -1){
 					curTag.replaceAll(",", "_");
 				}
+				curAppName = tryGetAppName(curPid, curAppName, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, line);
+						curTid, curTag, curTime, line, curAppName);
 				messages.add(m);
 			}
 		}

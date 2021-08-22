@@ -133,7 +133,7 @@ public class UIThread {
         }
     }
 	
-	public void runUI() {
+	public void runUI(String[] args) {
         Display.setAppName(APP_NAME);
         mDisplay = Display.getDefault();
         Shell shell = new Shell(mDisplay, SWT.SHELL_TRIM);
@@ -144,6 +144,10 @@ public class UIThread {
         createWidgets(shell);
         shell.pack();
         shell.setMaximized(true);
+        if(args.length == 1)
+        {
+        	LogCatMessageParser.getInstance().parseLogFile(args[0], PANEL_ID_MAIN);	
+        }
         shell.open();
         while (!shell.isDisposed()) {
             if (!mDisplay.readAndDispatch())
