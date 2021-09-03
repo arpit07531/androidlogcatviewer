@@ -71,9 +71,9 @@ public final class LogCatMessageLabelProvider extends ColumnLabelProvider {
             case INDEX_PID:
                 return m.getPid();
             case INDEX_TID:
-                return m.getTid();
+                return m.getThreadFriendlyName();
             case INDEX_APPNAME:
-                return m.getAppName();
+                return m.getApplicationFriendlyName();
             case INDEX_TIME_ELAPSED:
             	return String.valueOf(m.getTimeElapsed());
             case INDEX_TAG:

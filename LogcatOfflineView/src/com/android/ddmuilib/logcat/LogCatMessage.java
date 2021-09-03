@@ -28,11 +28,14 @@ public final class LogCatMessage {
     private final LogLevel mLogLevel;
     private final String mPid;
     private final String mTid;
-    private String mAppName = null;
+    private String mAppName;
     private final String mTag;
     private final String mTime;
     private final String mMessage;
     private final long mTimeElapsed;
+    private String mThreadFriendlyName;
+    private String mApplicationFriendlyName;
+
 
     /**
      * Construct an immutable log message object.
@@ -61,6 +64,8 @@ public final class LogCatMessage {
         } else {
         	mTid = Long.toString(tidValue);
         }
+        mThreadFriendlyName = mTid;
+        mApplicationFriendlyName = mAppName;
     }
 
     public LogLevel getLogLevel() {
@@ -78,6 +83,11 @@ public final class LogCatMessage {
     public String getAppName() {
         return mAppName;
     }
+    
+    public String getApplicationFriendlyName()
+    {
+    	return mApplicationFriendlyName;
+    }
 
     public String getTag() {
         return mTag;
@@ -94,6 +104,21 @@ public final class LogCatMessage {
     public long getTimeElapsed()
     {
     	return mTimeElapsed;
+    }
+    
+    public void setThreadFriendlyName(String threadId)
+    {
+    	mThreadFriendlyName = threadId;
+    }
+    
+    public void setApplicationFriendlyName(String processName)
+    {
+    	mApplicationFriendlyName = processName;
+    }
+    
+    public String getThreadFriendlyName()
+    {
+    	return mThreadFriendlyName;
     }
 
     @Override
