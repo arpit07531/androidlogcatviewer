@@ -35,8 +35,9 @@ public final class LogCatMessageLabelProvider extends ColumnLabelProvider {
     private static final int INDEX_PID = 2;
     private static final int INDEX_TID = 3;
     private static final int INDEX_APPNAME = 4;
-    private static final int INDEX_TAG = 5;
-    private static final int INDEX_TEXT = 6;
+    private static final int INDEX_TIME_ELAPSED = 5;
+    private static final int INDEX_TAG = 6;
+    private static final int INDEX_TEXT = 7;
 
     /* Default Colors for different log levels. */
     private static final Color INFO_MSG_COLOR =    new Color(null, 0, 127, 0);
@@ -73,6 +74,8 @@ public final class LogCatMessageLabelProvider extends ColumnLabelProvider {
                 return m.getTid();
             case INDEX_APPNAME:
                 return m.getAppName();
+            case INDEX_TIME_ELAPSED:
+            	return String.valueOf(m.getTimeElapsed());
             case INDEX_TAG:
                 return m.getTag();
             case INDEX_TEXT:

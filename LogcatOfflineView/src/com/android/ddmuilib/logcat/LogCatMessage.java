@@ -32,18 +32,20 @@ public final class LogCatMessage {
     private final String mTag;
     private final String mTime;
     private final String mMessage;
+    private final long mTimeElapsed;
 
     /**
      * Construct an immutable log message object.
      */
     public LogCatMessage(LogLevel logLevel, String pid, String tid, 
-            String tag, String time, String msg, String appName) {
+            String tag, String time, String msg, String appName, long timeElapsed) {
         mLogLevel = logLevel;
         mPid = pid;
         mAppName = appName;
         mTag = tag;
         mTime = time;
         mMessage = msg;
+        mTimeElapsed = timeElapsed;
 
         long tidValue;
         try {
@@ -87,6 +89,11 @@ public final class LogCatMessage {
 
     public String getMessage() {
         return mMessage;
+    }
+    
+    public long getTimeElapsed()
+    {
+    	return mTimeElapsed;
     }
 
     @Override

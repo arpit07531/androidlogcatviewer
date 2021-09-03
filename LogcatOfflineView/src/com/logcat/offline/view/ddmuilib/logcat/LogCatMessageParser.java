@@ -24,7 +24,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +53,8 @@ public final class LogCatMessageParser {
     private static LogCatMessageParser logCatMessageParser;
     
     private static Map<String,String> s_PID_AppnameMap = new HashMap<>();
+    
+    private static Map<String, Date> s_PID_StartTimeStamp = new HashMap<>();
 
     /**
      * This pattern is meant to parse the first line of a log message with the option
@@ -83,6 +91,8 @@ public final class LogCatMessageParser {
     	return logCatMessageParser;
     }
     
+    
+    
     private String tryGetAppName(String pid, String message, String tag)
     {
     	if(tag !=null && tag.equals("ActivityManager"))
@@ -108,6 +118,33 @@ public final class LogCatMessageParser {
     	}
     	    	
     	return pid;
+    }
+    
+    private long getTimeElapsed(String pid, String timestamp)
+    {
+    	//09-02 13:52:38.928
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
+    	try {
+			Date parsedDate = dateFormat.parse(timestamp);
+			if(s_PID_StartTimeStamp.containsKey(pid))
+	    	{
+	    		return parsedDate.getTime() - s_PID_StartTimeStamp.get(pid).getTime();
+	    	}
+	    	else
+	    	{
+	    		s_PID_StartTimeStamp.put(pid, parsedDate);
+	    		return 0;	
+	    	}
+			
+			
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return 0;
+		}
+    	//DateTimeFormatter f = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS");
+    	//LocalDateTime dateTime = LocalDateTime.from(f.parse(timestamp));
+    	
     }
     
     private PatternType PatternRecognition(String str){
@@ -228,6 +265,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -256,9 +294,10 @@ public final class LogCatMessageParser {
 					continue;
 				}
 				curAppName = tryGetAppName(curPid, curMesssage, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
 
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage,curAppName);
+						curTid, curTag, curTime, curMesssage,curAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -280,6 +319,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -310,9 +350,11 @@ public final class LogCatMessageParser {
 					continue;
 				}
 				
+				timeElapsed = getTimeElapsed(curPid, curTime);
+				
 				curAppName = tryGetAppName(curPid, curMesssage, curTag);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage,curAppName);
+						curTid, curTag, curTime, curMesssage,curAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -332,6 +374,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -363,8 +406,9 @@ public final class LogCatMessageParser {
 				}
 
 				curAppName = tryGetAppName(curPid, curMesssage, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage, curAppName);
+						curTid, curTag, curTime, curMesssage, curAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -383,6 +427,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String currAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -404,8 +449,9 @@ public final class LogCatMessageParser {
 					continue;
 				}
 				currAppName = tryGetAppName(curPid, curMesssage, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage, currAppName);
+						curTid, curTag, curTime, curMesssage, currAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -424,6 +470,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -449,8 +496,9 @@ public final class LogCatMessageParser {
 					continue;
 				}
 				curAppName = tryGetAppName(curPid, curMesssage, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage,curAppName);
+						curTid, curTag, curTime, curMesssage,curAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -469,6 +517,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -491,8 +540,9 @@ public final class LogCatMessageParser {
 					continue;
 				}
 				curAppName = tryGetAppName(curPid, curMesssage, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage,curAppName);
+						curTid, curTag, curTime, curMesssage,curAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -504,7 +554,7 @@ public final class LogCatMessageParser {
     private static final String UNKNOWN_FORMAT_TAG = "UNKNOWN_FORMAT";
 	private void addAsUnkownFormat(List<LogCatMessage> messages, String line) {
 		LogCatMessage m = new LogCatMessage(LogLevel.WARN, "", "",
-				UNKNOWN_FORMAT_TAG, "", line,"?");
+				UNKNOWN_FORMAT_TAG, "", line,"?",0);
 		messages.add(m);
 	}
 	
@@ -521,6 +571,7 @@ public final class LogCatMessageParser {
 		String curTime = "?";
 		String curMesssage = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -552,9 +603,11 @@ public final class LogCatMessageParser {
 				}
 				
 				curAppName = tryGetAppName(curPid, curMesssage, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
+
 
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, curMesssage,curAppName);
+						curTid, curTag, curTime, curMesssage,curAppName,timeElapsed);
 				messages.add(m);
 			}else{
 				addAsUnkownFormat(messages, line);
@@ -570,6 +623,7 @@ public final class LogCatMessageParser {
 		String curTag = "?";
 		String curTime = "?";
 		String curAppName = "?";
+		long timeElapsed = 0;
 		List<LogCatMessage> messages = new ArrayList<LogCatMessage>();
 		for (String line : linesList) {
 			if (line.length() == 0) {
@@ -597,8 +651,9 @@ public final class LogCatMessageParser {
 					curTag.replaceAll(",", "_");
 				}
 				curAppName = tryGetAppName(curPid, curAppName, curTag);
+				timeElapsed = getTimeElapsed(curPid, curTime);
 				LogCatMessage m = new LogCatMessage(curLogLevel, curPid,
-						curTid, curTag, curTime, line, curAppName);
+						curTid, curTag, curTime, line, curAppName,timeElapsed);
 				messages.add(m);
 			}
 		}

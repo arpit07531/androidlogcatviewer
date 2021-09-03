@@ -763,7 +763,7 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
         /** Columns to show in the table. */
         String[] properties = { "Level", "Time", "PID",
             "TID",// add tid
-            "Application",
+            "Application","Time Elapsed(ms)",
             "Tag", "Text", };
 
         /**
@@ -772,13 +772,14 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
          */
         String[] sampleText =
             {
-                "    ",
-                "    00-00 00:00:00.0000 ",
-                "  0000",
-                "    com.android.launcher",
-                "  0000",// add tid
-                "    SampleTagText++++",
-                "    Log Message field should be pretty long by default. As long as possible for correct display on Mac.", };
+                "   ",
+                " 00-00 00:00:00.0000 ",
+                " 0000",
+                " com.android.launcher",
+                " 16200",
+                " 0000",// add tid
+                " SampleTagText++++",
+                " Log Message field should be pretty long by default. As long as possible for correct display on Mac.", };
 
         mLogCatMessageLabelProvider = new LogCatMessageLabelProvider(getFontFromPrefStore());
         for (int i = 0; i < properties.length; i++) {
