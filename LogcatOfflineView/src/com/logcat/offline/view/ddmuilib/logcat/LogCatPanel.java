@@ -1238,6 +1238,8 @@ public final class LogCatPanel implements ILogCatMessageEventListener, ILogCatSy
 		mResetThreadAndProcessName = new Action(RESET_THREAD_PROCESS_NAME) {
 			@Override
 			public void run() {
+				mSetProcessName.setText(ACTION_SET_PID_FRIENDLY_NAME);
+				mSetThreadName.setText(ACTION_SET_TID_FRIENDLY_NAME);
 				List<LogCatMessageWrapper> allItems = getAllLogcatMessageUnfiltered();
 				for (int i = 0; i < allItems.size(); i++) {
 					LogCatMessageWrapper logCatMessageWrapper = allItems.get(i);
